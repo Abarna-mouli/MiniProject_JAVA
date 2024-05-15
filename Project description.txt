@@ -1,0 +1,28 @@
+Popular news Channel wants to store information about 10 programs they are broadcasting.
+Information such as News-Program Name, Anchor, Month-of-Broadcasting, TRP Rating and Business (all figures in millions) the Program has made, have to be stored.Create a class 
+and Use appropriate data types.
+	Sample Data is provided as-			
+News-Program Name	Anchor	Month-of-Broadcasting	TRP Rating	Business
+Headlines Yesterday	Charkha Bhatt	1	15.98	300
+360 0 Turning Point	Rajwinder	1	2.98	10
+Lunch News	SriSai	2	0.77	2
+India 1 Minute	Charkha Bhatt	1	23.31	700
+
+Create a Menu to-
+1) Accept data and create objects.
+2) Find out in which month the maximum collection has happened and how much, with the program names.
+3) Which anchor has maximum number of programs to his credit i.e. who is the most busy anchor?
+
+The OUTPUT for 2nd and 3rd options should be as follows:
+
+Month: 1 (January optional)
+2nd option:
+Sr. No.		Program name		Business
+1		Headlines Yesterday	300
+2		360 0 Turning Point	 10
+3		India 1 Minute		700
+Total Business		1010 (Figures in Millions)
+
+3rd option:
+Anchor name: Charkha Bhatt
+Number of programs: 2
