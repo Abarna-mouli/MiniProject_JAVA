@@ -1,6 +1,8 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-// Abstraction and Inheritance
 abstract class Channel {
     private String programName;
     private String anchor;
@@ -16,7 +18,6 @@ abstract class Channel {
         this.business = business;
     }
 
-    // Encapsulation
     public String getProgramName() {
         return programName;
     }
@@ -57,17 +58,14 @@ abstract class Channel {
         this.business = business;
     }
 
-    // Abstract method
     public abstract void display();
 }
 
 class NewChannel extends Channel {
-
     public NewChannel(String programName, String anchor, int month, double trpRating, double business) {
         super(programName, anchor, month, trpRating, business);
     }
 
-    // Polymorphism (Method Overriding)
     @Override
     public void display() {
         System.out.println("\nProgram name: " + getProgramName() +
@@ -78,40 +76,73 @@ class NewChannel extends Channel {
     }
 }
 
-public class Oops {
+public class OopsGUI {
+    private JFrame frame;
+    private JTextArea outputArea;
+    private Channel[] programs;
+    private int programCount = 0;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter number of programs:");
-        int n = sc.nextInt();
-        Channel[] programs = new Channel[n];
+    public OopsGUI() {
+        frame = new JFrame("News Channel Programs");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
 
-        for (int i = 0; i < n; i++) {
-            System.out.println("\n----------Enter details for program " + (i + 1) + "----------- ");
-            System.out.println("\nEnter the program name:");
-            String programName = sc.next();
-            System.out.println("\nEnter the Anchor name:");
-            String anchor = sc.next();
-            System.out.println("\nEnter the month:");
-            int month = sc.nextInt();
-            System.out.println("\nEnter the TRP Rating:");
-            double trpRating = sc.nextDouble();
-            System.out.println("\nEnter the Business profit (in millions):");
-            double business = sc.nextDouble();
-            programs[i] = new NewChannel(programName, anchor, month, trpRating, business);
-        }
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(0, 1));
 
-        System.out.println("*********************************************");
+        JButton addProgramButton = new JButton("Add Program");
+        addProgramButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addProgram();
+            }
+        });
+        panel.add(addProgramButton);
 
-        findMaxCollectionMonth(programs);
-        findBusyAnchor(programs);
+        JButton maxCollectionButton = new JButton("Find Max Collection Month");
+        maxCollectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                findMaxCollectionMonth();
+            }
+        });
+        panel.add(maxCollectionButton);
+
+        JButton busyAnchorButton = new JButton("Find Busy Anchor");
+        busyAnchorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                findBusyAnchor();
+            }
+        });
+        panel.add(busyAnchorButton);
+
+        outputArea = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        frame.getContentPane().add(panel, BorderLayout.NORTH);
+        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
     }
 
-    private static void findMaxCollectionMonth(Channel[] programs) {
+    private void addProgram() {
+        String programName = JOptionPane.showInputDialog("Enter the program name:");
+        String anchor = JOptionPane.showInputDialog("Enter the Anchor name:");
+        int month = Integer.parseInt(JOptionPane.showInputDialog("Enter the month:"));
+        double trpRating = Double.parseDouble(JOptionPane.showInputDialog("Enter the TRP Rating:"));
+        double business = Double.parseDouble(JOptionPane.showInputDialog("Enter the Business profit (in millions):"));
+
+        if (programs == null) {
+            programs = new Channel[10]; // assuming a max of 10 programs
+        }
+        programs[programCount++] = new NewChannel(programName, anchor, month, trpRating, business);
+        outputArea.append("Added program: " + programName + "\n");
+    }
+
+    private void findMaxCollectionMonth() {
+        if (programs == null) return;
         double[] monthlyTotal = new double[12];
 
-        for (Channel program : programs) {
-            monthlyTotal[program.getMonth() - 1] += program.getBusiness();
+        for (int i = 0; i < programCount; i++) {
+            monthlyTotal[programs[i].getMonth() - 1] += programs[i].getBusiness();
         }
 
         double maxProfit = 0;
@@ -124,43 +155,54 @@ public class Oops {
             }
         }
 
-        System.out.println("\nMonth with maximum collection: " + maxMonth );
-	System.out.println("---------------------------------------------------------------");
-
-        System.out.println("Programs with their profits for the month:");
+        outputArea.append("\nMonth with maximum collection: " + maxMonth + "\n");
         double totalProfit = 0;
-        for (Channel program : programs) {
-            if (program.getMonth() == maxMonth) {
-                System.out.println("Program name: " + program.getProgramName() +"\t"+ "\tProfit: " + program.getBusiness() + " million");
-                totalProfit += program.getBusiness();
+        for (int i = 0; i < programCount; i++) {
+            if (programs[i].getMonth() == maxMonth) {
+                outputArea.append("Program name: " + programs[i].getProgramName() + "\tProfit: " + programs[i].getBusiness() + " million\n");
+                totalProfit += programs[i].getBusiness();
             }
         }
-	System.out.println("---------------------------------------------------------------");
-        System.out.println("Total profit for the month: " + totalProfit + " million");
+        outputArea.append("Total profit for the month: " + totalProfit + " million\n");
     }
 
-    private static void findBusyAnchor(Channel[] programs) {
+    private void findBusyAnchor() {
+        if (programs == null) return;
         String busiestAnchor = "";
         int maxCount = 0;
 
-        for (Channel program : programs) {
+        for (int i = 0; i < programCount; i++) {
             int count = 1;
-            for (Channel otherProgram : programs) {
-                if (otherProgram != program && otherProgram.getAnchor().equals(program.getAnchor())) {
+            for (int j = 0; j < programCount; j++) {
+                if (i != j && programs[j].getAnchor().equals(programs[i].getAnchor())) {
                     count++;
                 }
             }
             if (count > maxCount) {
                 maxCount = count;
-                busiestAnchor = program.getAnchor();
+                busiestAnchor = programs[i].getAnchor();
             }
         }
 
-        if (maxCount == 1) {
-            System.out.println("\nThere is no busy anchor");
+        if (maxCount <= 1) {
+            outputArea.append("\nThere is no busy anchor\n");
         } else {
-            System.out.println("\nBusiest anchor: " + busiestAnchor);
-            System.out.println("Number of programs: " + maxCount);
+            outputArea.append("\nBusiest anchor: " + busiestAnchor + "\n");
+            outputArea.append("Number of programs: " + maxCount + "\n");
         }
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OopsGUI window = new OopsGUI();
+                    window.frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
